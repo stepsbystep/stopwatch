@@ -60,16 +60,20 @@ if st.session_state.showWatch:
         if st.button("Start/Reset"):
             st.session_state.startTime=dt.now()
             st.session_state.updateTime=True
+            st.session_state.pause=False
             print("start/reset")
             asyncio.run(watch(test))
         if st.button("Pause/Resume"):
             # pause
             if st.session_state.updateTime==True:
                 st.session_state.updateTime=False
+                st.session_state.pause=True
                 st.session_state.pauseTime=dt.now()
+                st.session_state.elapsedTime=dt.now()-st.session_state.startTime                
                 print("pause")
             # resume
             else:
+                st.session_state.pause=False
                 st.session_state.updateTime=True
                 st.session_state.startTime=dt.now()-st.session_state.elapsedTime
                 print("resume")    
@@ -80,11 +84,14 @@ if st.session_state.showWatch:
         #    print("reset")
             asyncio.run(watch(test))
         if st.button("Stop"):
+            if st.session_state.pause==True:
+                st.session_state.startTime=dt.now()-st.session_state.elapsedTime
+                st.session_state.pause=False
             st.session_state.start=False
             st.session_state.updateTime=False
             st.session_state.makeFinal=True
             st.session_state.elapsedTime=dt.now()-st.session_state.startTime
-            ET=st.session_state.elapsedTime-datetime.timedelta(microseconds=st.session_state.elapsedTime.microseconds)
+            #ET=st.session_state.elapsedTime-datetime.timedelta(microseconds=st.session_state.elapsedTime.microseconds)
             #st.session_state.elapsedTime = ET - datetime.timedelta(microseconds=ET.microseconds)
             st.session_state.showWatch=False
             print("stop")
@@ -107,6 +114,7 @@ if st.session_state.makeFinal:
             """, unsafe_allow_html=True)
         time60=(dt.min+datetime.timedelta(seconds=60*ET.total_seconds())).time()
         time60upd = st.time_input("Entered time may be updated", time60, step=60)
+        #st.session_state.ElapsedTime=((time60upd-dt.min).total_seconds()).time()/60
     if st.button("Restart"):
         st.session_state.makeFinal=False
         st.rerun()
