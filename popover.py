@@ -106,15 +106,20 @@ if st.session_state.makeFinal:
     st.session_state.updateTime=True
     ET=st.session_state.elapsedTime-datetime.timedelta(microseconds=st.session_state.elapsedTime.microseconds)
     with reportContainer:
+        # big display of elapsed time
         st.markdown(
             f"""
             <p class="time">
                 Elapsed time: {str(ET)}
             </p>
             """, unsafe_allow_html=True)
+        # display in widget
         time60=(dt.min+datetime.timedelta(seconds=60*ET.total_seconds())).time()
         time60upd = st.time_input("Entered time may be updated", time60, step=60)
-        #st.session_state.ElapsedTime=((time60upd-dt.min).total_seconds()).time()/60
+        td_time60upd = datetime.timedelta(seconds=((dt.combine(dt.min,time60upd)-dt.min).total_seconds())/60)
+        st.session_state.ElapsedTime=td_time60upd
+        print("ET: ", st.session_state.ElapsedTime)
+        st.rerun()
     if st.button("Restart"):
         st.session_state.makeFinal=False
         st.rerun()
